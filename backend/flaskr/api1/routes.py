@@ -4,9 +4,10 @@ from flaskr import db
 from flaskr.models import Question, Category
 from . import api1
 from flask import abort, request, jsonify, current_app
-from sqlalchemy import func
+from sqlalchemy import func, create_engine
 import os
 import csv
+import pandas as pd
 
 import random
 
@@ -43,9 +44,21 @@ def post_csv_file():
                 for row in csv_file:
                     data.append(row)
         
-        print(data)
+        engine=create_engine("postgresql+psycopg2://postgres:postgres@localhost:5432/yuupee_db")
+
+        df = pd.read_csv(filepath)
+        try:
+            df.to_sql('products', con=engine, if_exists='replace')
+        except Exception as e:
+            print(e)
+            abort(422)
+        finally:
+            engine.dispose()
+
+        #print(data)
         return jsonify({
             'success': True,
+            'message': 'Import data success'
         })
         # Extracting uploaded data file name
         #data_filename = secure_filename(uploaded_df.filename)

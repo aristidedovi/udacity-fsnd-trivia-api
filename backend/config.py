@@ -27,7 +27,8 @@ class DevConfig(Config):
     """development config"""
     ENV = 'development'
     DEBUG = True
-    SQLALCHEMY_DATABASE_URI = environ.get('DEV_DATABASE_URI')
+    #SQLALCHEMY_DATABASE_URI = environ.get('DEV_DATABASE_URI')
+    SQLALCHEMY_DATABASE_URI = environ.get('YUUPEE_DATABASE_URI')
     FILE_UPLOADS = "./scv_file"
 
 class TestConfig(DevConfig):
