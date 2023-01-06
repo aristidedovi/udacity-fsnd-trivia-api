@@ -5,8 +5,16 @@ from flaskr.models import Question, Category
 from . import api1
 from flask import abort, request, jsonify, current_app
 from sqlalchemy import func
+import os
+import csv
 
 import random
+
+# Define folder to save uploaded files to process further
+UPLOAD_FOLDER = os.path.join('staticFiles', 'uploads')
+ 
+# Define allowed files (for this example I want only csv file)
+ALLOWED_EXTENSIONS = {'csv'}
 
 
 @api1.after_request
@@ -19,6 +27,40 @@ def after_request(response):
     response.headers.add('Content-Type', 'application/json')
     return response
 
+
+@api1.route('/upload_data', methods=['POST'])
+def post_csv_file():
+    data = []
+    if request.method == 'POST':
+        # upload file flask
+        uploaded_file = request.files['uploaded-file']
+
+        filepath = os.path.join(current_app.config['FILE_UPLOADS'], uploaded_file.filename)
+        uploaded_file.save(filepath)
+        
+        with open(filepath) as file:
+                csv_file = csv.reader(file)
+                for row in csv_file:
+                    data.append(row)
+        
+        print(data)
+        return jsonify({
+            'success': True,
+        })
+        # Extracting uploaded data file name
+        #data_filename = secure_filename(uploaded_df.filename)
+
+        # flask upload file to database (defined uploaded folder in static path)
+        #uploaded_df.save(os.path.join(app.config['UPLOAD_FOLDER'], data_filename))
+
+        # Storing uploaded file path in flask session
+        #session['uploaded_data_file_path'] = os.path.join(app.config['UPLOAD_FOLDER'], data_filename)
+        
+        # Retrieving uploaded file path from session
+        #data_file_path = session.get('uploaded_data_file_path', None)
+
+        # read csv file in python flask (reading uploaded csv file from uploaded server location)
+        #uploaded_df = pd.read_csv(data_file_path)
 
 @api1.route('/categories')
 def get_categories():
